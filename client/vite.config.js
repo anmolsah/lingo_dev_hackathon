@@ -1,19 +1,24 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite'
-import { lingoCompiler } from '@lingo.dev/compiler';
+import { lingoCompilerPlugin } from '@lingo.dev/compiler/vite';
 
 export default defineConfig({
     plugins: [
-        react(), tailwindcss(),
-        lingoCompiler({
-            apiKey: process.env.VITE_LINGO_API_KEY,
-            sourceLanguage: 'en',
-            targetLanguages: ['hi', 'bn', 'te', 'mr', 'ta', 'kn', 'gu', 'or', 'pa'],
-            usePseudotranslator: true // Set to false in production
+        react(), 
+        lingoCompilerPlugin({
+            sourceRoot: 'src',
+            sourceLocale: 'en',
+            targetLocales: ['hi', 'bn', 'te', 'mr', 'ta', 'kn', 'gu', 'or', 'pa'],
+            models: 'lingo.dev',
+            dev: {
+                usePseudotranslator: true,
+            },
         })
     ],
     server: {
         port: 5173
+    },
+    css: {
+        postcss: './postcss.config.js'
     }
 });

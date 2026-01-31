@@ -1,0 +1,19 @@
+2026-01-31T14:39:51.075Z [INFO] [Lingo.dev] 🔧 Initializing translator...
+2026-01-31T14:39:51.113Z [DEBUG] [Lingo.dev] Starting translation server on port 60000
+2026-01-31T14:39:51.181Z [INFO] [Lingo.dev] Translation server listening on http://127.0.0.1:60000
+2026-01-31T14:39:51.222Z [INFO] [Lingo.dev] WebSocket server initialized
+2026-01-31T14:40:02.008Z [DEBUG] [Lingo.dev] WebSocket client connected. Total clients: 1
+2026-01-31T14:40:02.037Z [INFO] [Lingo.dev] 📥 Received: OPTIONS /translations/en
+2026-01-31T14:40:02.058Z [INFO] [Lingo.dev] 🔄 Processing: OPTIONS /translations/en
+2026-01-31T14:40:02.082Z [DEBUG] [Lingo.dev] OPTIONS /translations/en
+2026-01-31T14:40:02.107Z [INFO] [Lingo.dev] 📥 Received: POST /translations/en
+2026-01-31T14:40:02.138Z [INFO] [Lingo.dev] 🔄 Processing: POST /translations/en
+2026-01-31T14:40:02.149Z [DEBUG] [Lingo.dev] POST /translations/en
+2026-01-31T14:40:02.158Z [DEBUG] [Lingo.dev] Reading request body...
+2026-01-31T14:40:02.165Z [DEBUG] [Lingo.dev] Chunk read, body: {"hashes":["098d438bc56f","bb402415f482","b535978e0998","0e577351c299","b2dfc65789e4","ce0a5d9e5a91","79d5a9c32af4","759eb5eb155b","5d9ab1188fdd","b5143db20a2c","c85ea44ce6de","4a71b404157b","2b4e4de3788f","f42b9cbff59b","768b41f87487","c171d034576d","92ae9b9aee6d","9dd847ddae9f","814d7f6824a5","5ec20c551f54","7413fe6e02b8","1ef3be755dc2","d5d9197176fc","193d1de6ebd3","893fb9b0e548"]}
+2026-01-31T14:40:02.174Z [DEBUG] [Lingo.dev] Parsed hashes: 098d438bc56f,bb402415f482,b535978e0998,0e577351c299,b2dfc65789e4,ce0a5d9e5a91,79d5a9c32af4,759eb5eb155b,5d9ab1188fdd,b5143db20a2c,c85ea44ce6de,4a71b404157b,2b4e4de3788f,f42b9cbff59b,768b41f87487,c171d034576d,92ae9b9aee6d,9dd847ddae9f,814d7f6824a5,5ec20c551f54,7413fe6e02b8,1ef3be755dc2,d5d9197176fc,193d1de6ebd3,893fb9b0e548
+2026-01-31T14:40:02.182Z [DEBUG] [Lingo.dev] Reloaded metadata: 61 entries
+2026-01-31T14:40:02.194Z [INFO] [Lingo.dev] 🔄 Translating 25 hashes to en
+2026-01-31T14:40:02.199Z [DEBUG] [Lingo.dev] 🔄 Hashes: 098d438bc56f, bb402415f482, b535978e0998, 0e577351c299, b2dfc65789e4, ce0a5d9e5a91, 79d5a9c32af4, 759eb5eb155b, 5d9ab1188fdd, b5143db20a2c, c85ea44ce6de, 4a71b404157b, 2b4e4de3788f, f42b9cbff59b, 768b41f87487, c171d034576d, 92ae9b9aee6d, 9dd847ddae9f, 814d7f6824a5, 5ec20c551f54, 7413fe6e02b8, 1ef3be755dc2, d5d9197176fc, 193d1de6ebd3, 893fb9b0e548
+2026-01-31T14:40:02.209Z [DEBUG] [Lingo.dev] [BUSY] Server is now busy (1 active)
+2026-01-31T14:40:02.584Z [DEBUG] [Lingo.dev] [IDLE] Server is now idle

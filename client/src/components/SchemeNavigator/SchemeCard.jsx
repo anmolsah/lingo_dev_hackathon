@@ -1,7 +1,10 @@
 import { ExternalLink, CheckCircle } from "lucide-react";
 
 export function SchemeCard({ scheme }) {
-  const translation = scheme.scheme_translations || {};
+  // Handle both array and object formats for translations
+  const translation = Array.isArray(scheme.scheme_translations)
+    ? scheme.scheme_translations[0] || {}
+    : scheme.scheme_translations || {};
 
   return (
     <div className="card">
@@ -20,14 +23,14 @@ export function SchemeCard({ scheme }) {
           "No description available"}
       </p>
 
-      {translation.eligibility && (
+      {(translation.eligibility_criteria || translation.eligibility) && (
         <div className="mb-4 text-sm">
           <div className="font-semibold mb-1 flex items-center gap-1">
             <CheckCircle size={16} className="text-green-600" />
             Eligibility:
           </div>
           <p className="text-gray-600 line-clamp-2">
-            {translation.eligibility}
+            {translation.eligibility_criteria || translation.eligibility}
           </p>
         </div>
       )}

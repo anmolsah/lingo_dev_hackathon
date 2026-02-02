@@ -1,62 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Filter, Clock, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
 import QuestionCard from '../components/QuestionCard';
 import TrendingTags from '../components/TrendingTags';
-import { Filter, Clock, TrendingUp, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { getQuestions, subscribeToQuestions } from '../services/questions';
 
 const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState('newest');
+  const [questions, setQuestions] = useState([]);
+  const [translatedQuestions, setTranslatedQuestions] = useState({});
+  const [loading, setLoading] = useState(true);
+  
+  const { currentLanguage, translateQuestionContent, isTranslating } = useLanguage();
 
-  // Mock data - will be replaced with Supabase + Lingo.dev translations
-  const questions = [
-    {
-      id: '1',
-      title: 'How do I handle unicode strings effectively in Python 3 across different operating systems?',
-      body: 'I\'m working on a cross-platform application that needs to handle text in multiple languages including Chinese, Arabic, and Hindi. What are the best practices?',
-      author: { name: 'CodeMaster', avatar: '' },
-      tags: ['python', 'unicode', 'cross-platform'],
-      votes: 42,
-      answers: 3,
-      views: 156,
-      createdAt: '2 hours ago',
-      originalLanguage: 'en',
-    },
-    {
-      id: '2',
-      title: 'Best practices for managing state in large React applications when using Context API vs Redux?',
-      body: 'I\'m building a dashboard that requires real-time updates and I\'m unsure if Context API will cause unnecessary re-renders compared to Redux Toolkit...',
-      author: { name: 'ReactFan', avatar: '' },
-      tags: ['react', 'redux', 'context-api', 'state-management'],
-      votes: 38,
-      answers: 5,
-      views: 234,
-      createdAt: '4 hours ago',
-      originalLanguage: 'en',
-    },
-    {
-      id: '3',
-      title: 'Difference between "wissen" and "kennen" in daily conversation?',
-      body: 'I keep getting these two mixed up. Can someone explain the nuance when talking about people versus facts?',
-      author: { name: 'GermanLearner', avatar: '' },
-      tags: ['deutsch', 'german-learning', 'vocabulary'],
-      votes: 25,
-      answers: 4,
-      views: 189,
-      createdAt: '6 hours ago',
-      originalLanguage: 'de',
-    },
-    {
-      id: '4',
-      title: 'How to center a div horizontally and vertically using Grid vs Flexbox?',
-      body: 'I know justify-content: center and align-items: center work for flex, but what is the equivalent shorthand for CSS Grid?',
-      author: { name: 'CSSNinja', avatar: '' },
-      tags: ['css', 'flexbox', 'css-grid', 'web-dev'],
-      votes: 67,
-      answers: 8,
-      views: 445,
-      createdAt: '1 day ago',
-      originalLanguage: 'en',
-    },
-  ];
+  // Fetch questions on mount and filter change
+  useEffect(() => {
+    async function fetchQuestions() {
+      setLoading(true);
+      try {
+        const data = await getQuestions(activeFilter);
+        setQuestions(data);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchQuestions();
+  }, [activeFilter]);
+
+  // Subscribe to realtime updates
+  useEffect(() => {
+    const unsubscribe = subscribeToQuestions((payload) => {
+      console.log('Realtime update:', payload);
+      // Refresh questions on any change
+      getQuestions(activeFilter).then(setQuestions);
+    });
+
+    return () => unsubscribe();
+  }, [activeFilter]);
+
+  // Translate questions when language changes
+  useEffect(() => {
+    async function translateAll() {
+      const translations = {};
+      
+      for (const question of questions) {
+        if (question.originalLanguage !== currentLanguage) {
+          const translated = await translateQuestionContent(question);
+          if (translated) {
+            translations[question.id] = translated;
+          }
+        }
+      }
+      
+      setTranslatedQuestions(translations);
+    }
+
+    if (questions.length > 0) {
+      translateAll();
+    }
+  }, [questions, currentLanguage, translateQuestionContent]);
 
   const filters = [
     { id: 'newest', label: 'Newest', icon: Clock },
@@ -93,12 +98,31 @@ const Dashboard = () => {
             ))}
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            </div>
+          )}
+
           {/* Questions List */}
-          <div className="space-y-4">
-            {questions.map((question) => (
-              <QuestionCard key={question.id} question={question} />
-            ))}
-          </div>
+          {!loading && (
+            <div className="space-y-4">
+              {questions.map((question) => (
+                <QuestionCard 
+                  key={question.id} 
+                  question={question}
+                  translatedText={translatedQuestions[question.id]}
+                />
+              ))}
+              
+              {questions.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  No questions found. Be the first to ask!
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -115,13 +139,23 @@ const Dashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span className="opacity-80">Questions Today</span>
-                <span className="font-medium">847</span>
+                <span className="font-medium">{questions.length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="opacity-80">Translations</span>
-                <span className="font-medium">3.2k</span>
+                <span className="font-medium">{Object.keys(translatedQuestions).length}</span>
               </div>
             </div>
+          </div>
+
+          {/* Lingo.dev Powered Badge */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 text-center">
+            <p className="text-xs text-gray-400 mb-2">Powered by</p>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-lg">🔤</span>
+              <span className="font-semibold text-gray-900">Lingo.dev</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Real-time AI translations</p>
           </div>
         </aside>
       </div>

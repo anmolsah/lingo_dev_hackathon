@@ -1,31 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import AskQuestion from './pages/AskQuestion';
+import QuestionDetails from './pages/QuestionDetails';
 
 function App() {
-  const [currentLanguage, setCurrentLanguage] = useState('en');
-
-  const handleLanguageChange = (langCode) => {
-    setCurrentLanguage(langCode);
-    // TODO: Trigger Lingo.dev translations
-    console.log('Language changed to:', langCode);
-  };
-
   return (
-    <BrowserRouter>
-      <Layout 
-        currentLanguage={currentLanguage} 
-        onLanguageChange={handleLanguageChange}
-      >
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/ask" element={<AskQuestion />} />
-          {/* More routes will be added */}
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </LanguageProvider>
+  );
+}
+
+function AppContent() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/ask" element={<AskQuestion />} />
+        <Route path="/question/:id" element={<QuestionDetails />} />
+      </Routes>
+    </Layout>
   );
 }
 

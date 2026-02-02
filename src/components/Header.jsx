@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, Globe } from 'lucide-react';
+import { Search, Bell, ChevronDown, Globe, Loader2 } from 'lucide-react';
+import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 
-const Header = ({ onLanguageChange, currentLanguage }) => {
+const Header = () => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-  
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  ];
+  const { currentLanguage, changeLanguage, isTranslating } = useLanguage();
 
-  const selectedLang = languages.find(l => l.code === currentLanguage) || languages[0];
+  const selectedLang = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0];
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 fixed top-0 left-64 right-0 z-10">
@@ -31,6 +24,14 @@ const Header = ({ onLanguageChange, currentLanguage }) => {
 
       {/* Right Section */}
       <div className="flex items-center gap-4 ml-6">
+        {/* Translation Indicator */}
+        {isTranslating && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Translating...</span>
+          </div>
+        )}
+
         {/* Language Switcher */}
         <div className="relative">
           <button
@@ -43,23 +44,37 @@ const Header = ({ onLanguageChange, currentLanguage }) => {
           </button>
 
           {isLangDropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    onLanguageChange(lang.code);
-                    setIsLangDropdownOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${
-                    currentLanguage === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
-                  }`}
-                >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span className="text-sm font-medium">{lang.name}</span>
-                </button>
-              ))}
-            </div>
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setIsLangDropdownOpen(false)} 
+              />
+              {/* Dropdown */}
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 max-h-80 overflow-y-auto">
+                <div className="px-3 py-2 border-b border-gray-100">
+                  <p className="text-xs font-medium text-gray-400 uppercase">Select Language</p>
+                </div>
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      changeLanguage(lang.code);
+                      setIsLangDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${
+                      currentLanguage === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                    }`}
+                  >
+                    <span className="text-lg">{lang.flag}</span>
+                    <span className="text-sm font-medium">{lang.name}</span>
+                    {currentLanguage === lang.code && (
+                      <span className="ml-auto text-blue-500">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
 

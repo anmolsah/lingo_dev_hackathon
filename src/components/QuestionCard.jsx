@@ -1,0 +1,113 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { MessageCircle, ThumbsUp, Eye, Bookmark, Globe } from 'lucide-react';
+
+const QuestionCard = ({ question, translatedText }) => {
+  const {
+    id,
+    title,
+    body,
+    author,
+    tags,
+    votes,
+    answers,
+    views,
+    createdAt,
+    originalLanguage,
+  } = question;
+
+  // Use translated text if available, otherwise use original
+  const displayTitle = translatedText?.title || title;
+  const displayBody = translatedText?.body || body;
+
+  const languageFlags = {
+    en: '🇺🇸',
+    es: '🇪🇸',
+    hi: '🇮🇳',
+    de: '🇩🇪',
+    fr: '🇫🇷',
+    ja: '🇯🇵',
+  };
+
+  return (
+    <article className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg hover:shadow-gray-100 transition-all duration-300 group">
+      <div className="flex gap-4">
+        {/* Stats Column */}
+        <div className="flex flex-col items-center gap-2 text-center min-w-[60px]">
+          <div className="flex flex-col items-center">
+            <span className="text-lg font-bold text-gray-900">{votes}</span>
+            <span className="text-xs text-gray-500">votes</span>
+          </div>
+          <div className={`flex flex-col items-center px-2 py-1 rounded-lg ${answers > 0 ? 'bg-green-50 text-green-600' : ''}`}>
+            <span className="text-lg font-bold">{answers}</span>
+            <span className="text-xs">answers</span>
+          </div>
+          <div className="flex flex-col items-center text-gray-400">
+            <span className="text-sm font-medium">{views}</span>
+            <span className="text-xs">views</span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <Link 
+            to={`/question/${id}`}
+            className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 group-hover:text-blue-600"
+          >
+            {displayTitle}
+          </Link>
+
+          {/* Body Preview */}
+          <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+            {displayBody}
+          </p>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {tags.map((tag) => (
+              <Link
+                key={tag}
+                to={`/tags/${tag}`}
+                className="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+            {/* Author & Language */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full" />
+                <span className="text-sm text-gray-600">{author.name}</span>
+              </div>
+              <span className="text-xs text-gray-400">•</span>
+              <span className="text-xs text-gray-500">{createdAt}</span>
+              {translatedText && (
+                <>
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs text-blue-500 flex items-center gap-1">
+                    <Globe className="w-3 h-3" />
+                    Translated from {languageFlags[originalLanguage]}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                <Bookmark className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+export default QuestionCard;

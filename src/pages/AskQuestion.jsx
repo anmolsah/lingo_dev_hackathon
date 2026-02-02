@@ -1,0 +1,263 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Lightbulb, 
+  ArrowRight, 
+  Globe, 
+  Tag, 
+  Code,
+  Bold,
+  Italic,
+  List,
+  Link as LinkIcon,
+  Image
+} from 'lucide-react';
+
+const AskQuestion = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: '',
+    body: '',
+    language: 'en',
+    tags: [],
+  });
+  const [tagInput, setTagInput] = useState('');
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  ];
+
+  const handleAddTag = (e) => {
+    if (e.key === 'Enter' && tagInput.trim() && formData.tags.length < 5) {
+      e.preventDefault();
+      if (!formData.tags.includes(tagInput.trim().toLowerCase())) {
+        setFormData({
+          ...formData,
+          tags: [...formData.tags, tagInput.trim().toLowerCase()],
+        });
+      }
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter((tag) => tag !== tagToRemove),
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: Submit to Supabase
+    console.log('Submitting question:', formData);
+    navigate('/');
+  };
+
+  const guidelines = [
+    {
+      step: 1,
+      title: 'Summarize the problem',
+      description: 'Include details about what you\'ve tried and exactly what you are trying to achieve.',
+    },
+    {
+      step: 2,
+      title: 'Describe what you\'ve tried',
+      description: 'Show what you\'ve tried and tell us what you found (on this site or elsewhere).',
+    },
+    {
+      step: 3,
+      title: 'Show some code',
+      description: 'When appropriate, share the minimum amount of code others need to reproduce your problem.',
+    },
+  ];
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Ask a Question</h1>
+        <p className="text-gray-500 mt-1">Get help from the multilingual community. Be specific and clear.</p>
+      </div>
+
+      <div className="flex gap-6">
+        {/* Main Form */}
+        <form onSubmit={handleSubmit} className="flex-1 space-y-6">
+          {/* Language Selection */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+              <Globe className="w-4 h-4 text-blue-500" />
+              What language are you writing in?
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, language: lang.code })}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                    formData.language === lang.code
+                      ? 'border-blue-500 bg-blue-50 text-blue-600'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <span>{lang.flag}</span>
+                  <span className="text-sm font-medium">{lang.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Be specific and imagine you're asking a question to another person.
+            </p>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="e.g. How do I handle async/await in JavaScript?"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              required
+            />
+          </div>
+
+          {/* Body */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              What are the details of your problem?
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Include all the information someone would need to answer your question.
+            </p>
+            
+            {/* Editor Toolbar */}
+            <div className="flex items-center gap-1 p-2 bg-gray-50 rounded-t-xl border border-gray-200 border-b-0">
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <Bold className="w-4 h-4 text-gray-600" />
+              </button>
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <Italic className="w-4 h-4 text-gray-600" />
+              </button>
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <Code className="w-4 h-4 text-gray-600" />
+              </button>
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <LinkIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <List className="w-4 h-4 text-gray-600" />
+              </button>
+              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                <Image className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            
+            <textarea
+              value={formData.body}
+              onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+              rows={8}
+              placeholder="Describe your question in detail..."
+              className="w-full px-4 py-3 border border-gray-200 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+              required
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <Tag className="w-4 h-4 text-blue-500" />
+              Tags
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Add up to 5 tags to describe what your question is about.
+            </p>
+            
+            <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
+              {formData.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm"
+                >
+                  #{tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="ml-1 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleAddTag}
+                placeholder={formData.tags.length < 5 ? 'Add a tag...' : 'Max 5 tags'}
+                disabled={formData.tags.length >= 5}
+                className="flex-1 min-w-[120px] outline-none text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Submit */}
+          <div className="flex items-center gap-4">
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+            >
+              Post Question
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Discard
+            </button>
+          </div>
+        </form>
+
+        {/* Guidelines Sidebar */}
+        <aside className="w-80">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-5 sticky top-24">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+              <Lightbulb className="w-5 h-5 text-amber-500" />
+              Writing a good question
+            </h3>
+            <ol className="space-y-4">
+              {guidelines.map((guide) => (
+                <li key={guide.step} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {guide.step}
+                  </span>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900">{guide.title}</h4>
+                    <p className="text-xs text-gray-600 mt-1">{guide.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <button className="mt-4 text-sm text-amber-600 hover:underline flex items-center gap-1">
+              See full guidelines
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+};
+
+export default AskQuestion;

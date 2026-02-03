@@ -11,7 +11,7 @@ const Dashboard = () => {
   const [translatedQuestions, setTranslatedQuestions] = useState({});
   const [loading, setLoading] = useState(true);
   
-  const { currentLanguage, translateQuestionContent, isTranslating } = useLanguage();
+  const { currentLanguage, translateQuestionContent } = useLanguage();
 
   // Fetch questions on mount and filter change
   useEffect(() => {

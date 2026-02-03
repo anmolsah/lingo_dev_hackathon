@@ -10,11 +10,15 @@ import {
   Italic,
   List,
   Link as LinkIcon,
-  Image
+  Image,
+  Loader2
 } from 'lucide-react';
+import { createQuestion } from '../services/questions';
+import { useAuth } from '../context/AuthContext';
 
 const AskQuestion = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     body: '',
@@ -22,6 +26,8 @@ const AskQuestion = () => {
     tags: [],
   });
   const [tagInput, setTagInput] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -52,11 +58,29 @@ const AskQuestion = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Submit to Supabase
-    console.log('Submitting question:', formData);
-    navigate('/');
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Create question in Supabase
+      const newQuestion = await createQuestion({
+        title: formData.title,
+        body: formData.body,
+        tags: formData.tags,
+        original_language: formData.language,
+        author_name: user?.email?.split('@')[0] || user?.user_metadata?.full_name || 'Anonymous',
+      });
+
+      console.log('Question created:', newQuestion);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error creating question:', err);
+      setError(err.message || 'Failed to post question. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const guidelines = [
@@ -210,19 +234,37 @@ const AskQuestion = () => {
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Submit */}
           <div className="flex items-center gap-4">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Post Question
-              <ArrowRight className="w-4 h-4" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Posting...
+                </>
+              ) : (
+                <>
+                  Post Question
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
             <button
               type="button"
-              onClick={() => navigate('/')}
-              className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+              onClick={() => navigate('/dashboard')}
+              disabled={isSubmitting}
+              className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
             >
               Discard
             </button>

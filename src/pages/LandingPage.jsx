@@ -1,7 +1,32 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const LandingPage = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#137fec]"></div>
+      </div>
+    );
+  }
+
+  // If user is logged in, don't render (redirect will happen)
+  if (user) {
+    return null;
+  }
+
   const languages = [
     { 
       name: 'English', 

@@ -6,7 +6,7 @@ const Sidebar = () => {
   const location = useLocation();
   
   const navItems = [
-    { icon: Home, label: 'Home', path: '/' },
+    { icon: Home, label: 'Home', path: '/dashboard' },
     { icon: Globe, label: 'Languages', path: '/languages' },
     { icon: HelpCircle, label: 'My Questions', path: '/my-questions' },
     { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
@@ -22,7 +22,7 @@ const Sidebar = () => {
     <aside className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0">
       {/* Logo */}
       <div className="p-6 border-b border-gray-100">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
             <Globe className="w-5 h-5 text-white" />
           </div>

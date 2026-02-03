@@ -23,7 +23,7 @@ import {
 
 const Profile = () => {
   const { user, signOut } = useAuth();
-  const { currentLanguage, setCurrentLanguage, supportedLanguages } = useLanguage();
+  const { currentLanguage, changeLanguage, languages: supportedLanguages } = useLanguage();
   const navigate = useNavigate();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -226,7 +226,7 @@ const Profile = () => {
                   </label>
                   <select
                     value={currentLanguage}
-                    onChange={(e) => setCurrentLanguage(e.target.value)}
+                    onChange={(e) => changeLanguage(e.target.value)}
                     className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm"
                   >
                     {supportedLanguages.map((lang) => (

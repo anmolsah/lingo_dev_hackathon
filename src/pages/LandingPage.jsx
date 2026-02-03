@@ -62,9 +62,14 @@ const LandingPage = () => {
             <a className="text-sm font-medium text-slate-600 hover:text-[#137fec] transition-colors" href="#">Blog</a>
           </nav>
           <div className="flex items-center gap-4">
-            <button className="hidden text-sm font-medium text-slate-700 hover:text-[#137fec] sm:block">Log In</button>
             <Link 
-              to="/dashboard"
+              to="/login"
+              className="hidden text-sm font-medium text-slate-700 hover:text-[#137fec] sm:block"
+            >
+              Log In
+            </Link>
+            <Link 
+              to="/signup"
               className="flex h-10 items-center justify-center rounded-lg bg-[#137fec] px-5 text-sm font-bold text-white transition-transform hover:scale-105 hover:shadow-lg hover:shadow-[#137fec]/30"
             >
               Sign Up
@@ -88,13 +93,13 @@ const LandingPage = () => {
                 </p>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                   <Link 
-                    to="/dashboard"
+                    to="/signup"
                     className="flex h-12 items-center justify-center rounded-lg bg-[#137fec] px-8 text-base font-bold text-white shadow-lg shadow-[#137fec]/25 transition-all hover:bg-blue-600 hover:shadow-xl hover:-translate-y-0.5"
                   >
                     Get Started
                   </Link>
                   <Link 
-                    to="/dashboard"
+                    to="/login"
                     className="flex h-12 items-center justify-center rounded-lg bg-white px-8 text-base font-bold text-slate-700 border border-slate-200 shadow-sm transition-all hover:bg-slate-50"
                   >
                     Browse Topics

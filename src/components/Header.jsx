@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Bell, ChevronDown, Globe, Loader2 } from 'lucide-react';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const { currentLanguage, changeLanguage, isTranslating } = useLanguage();
+  const { user } = useAuth();
 
   const selectedLang = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0];
+  
+  const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 fixed top-0 left-64 right-0 z-10">
@@ -85,16 +91,20 @@ const Header = () => {
         </button>
 
         {/* Profile */}
-        <button className="flex items-center gap-3 pl-3 pr-4 py-2 hover:bg-gray-50 rounded-xl transition-colors">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-            AS
+        <Link 
+          to="/profile"
+          className="flex items-center gap-3 pl-3 pr-4 py-2 hover:bg-gray-50 rounded-xl transition-colors"
+        >
+          <div className="w-8 h-8 bg-gradient-to-br from-[#137fec] to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            {initials}
           </div>
-          <span className="text-sm font-medium text-gray-700">Anmol</span>
+          <span className="text-sm font-medium text-gray-700">{displayName}</span>
           <ChevronDown className="w-4 h-4 text-gray-400" />
-        </button>
+        </Link>
       </div>
     </header>
   );
 };
 
 export default Header;
+

@@ -10,6 +10,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import AskQuestion from './pages/AskQuestion';
 import QuestionDetails from './pages/QuestionDetails';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -36,6 +37,11 @@ function App() {
             <Route path="/question/:id" element={
               <ProtectedRoute>
                 <Layout><QuestionDetails /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Layout><Profile /></Layout>
               </ProtectedRoute>
             } />
           </Routes>

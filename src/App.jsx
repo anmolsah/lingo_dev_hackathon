@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import AskQuestion from './pages/AskQuestion';
 import QuestionDetails from './pages/QuestionDetails';
 import Profile from './pages/Profile';
+import Bookmarks from './pages/Bookmarks';
+import MyQuestions from './pages/MyQuestions';
 
 function App() {
   return (
@@ -53,12 +55,12 @@ function App() {
             } />
             <Route path="/my-questions" element={
               <ProtectedRoute>
-                <Layout><Dashboard /></Layout>
+                <Layout><MyQuestions /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/bookmarks" element={
               <ProtectedRoute>
-                <Layout><Dashboard /></Layout>
+                <Layout><Bookmarks /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/community/:id" element={

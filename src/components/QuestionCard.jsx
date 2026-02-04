@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, ThumbsUp, Eye, Bookmark, Globe } from 'lucide-react';
+import { isBookmarked, toggleBookmark } from '../services/bookmarks';
+import { useAuth } from '../context/AuthContext';
 
 const QuestionCard = ({ question, translatedText }) => {
+  const { user } = useAuth();
+  const [bookmarked, setBookmarked] = useState(false);
+  
   const {
     id,
     title,
@@ -15,6 +20,29 @@ const QuestionCard = ({ question, translatedText }) => {
     createdAt,
     originalLanguage,
   } = question;
+
+  // Check if bookmarked on mount
+  useEffect(() => {
+    async function checkBookmark() {
+      if (!user || !id) return;
+      const result = await isBookmarked(id);
+      setBookmarked(result);
+    }
+    checkBookmark();
+  }, [user, id]);
+
+  const handleToggleBookmark = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) return;
+    
+    try {
+      const result = await toggleBookmark(id);
+      setBookmarked(result);
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    }
+  };
 
   // Use translated text if available, otherwise use original
   const displayTitle = translatedText?.title || title;
@@ -99,8 +127,15 @@ const QuestionCard = ({ question, translatedText }) => {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
-                <Bookmark className="w-4 h-4" />
+              <button 
+                onClick={handleToggleBookmark}
+                className={`p-2 rounded-lg transition-colors ${
+                  bookmarked 
+                    ? 'text-blue-500 bg-blue-50' 
+                    : 'text-gray-400 hover:text-blue-500 hover:bg-blue-50'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
               </button>
             </div>
           </div>

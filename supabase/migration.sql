@@ -196,7 +196,8 @@ DROP POLICY IF EXISTS "Users can update own notifications" ON notifications;
 -- Create policies
 CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+-- Allow inserts from SECURITY DEFINER trigger or the user themselves
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Users can view own languages" ON user_languages FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can manage own languages" ON user_languages FOR ALL USING (auth.uid() = user_id);

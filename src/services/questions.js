@@ -47,10 +47,10 @@ export async function getQuestions(filter = 'newest') {
     return [];
   }
 
-  // Fetch questions with answer count using a subquery
+  // Fetch questions with answer count and votes
   let query = supabase
     .from('questions')
-    .select('*, answers(count)');
+    .select('*, answers(count), votes:votes(vote_type)');
 
   switch (filter) {
     case 'trending':
@@ -70,22 +70,27 @@ export async function getQuestions(filter = 'newest') {
     return [];
   }
 
-  // Transform with dynamic answer count
-  return data.map(row => ({
-    id: row.id,
-    title: row.title,
-    body: row.body,
-    author: { 
-      id: row.author_id,
-      name: row.author_name 
-    },
-    tags: row.tags || [],
-    votes: row.votes || 0,
-    answers: row.answers?.[0]?.count || 0,  // Dynamic count from join
-    views: row.views || 0,
-    createdAt: formatRelativeTime(row.created_at),
-    originalLanguage: row.original_language || 'en',
-  }));
+  // Transform with dynamic counts
+  return data.map(row => {
+    // Calculate total votes from votes array
+    const voteSum = row.votes?.reduce((sum, v) => sum + (v.vote_type || 0), 0) || 0;
+    
+    return {
+      id: row.id,
+      title: row.title,
+      body: row.body,
+      author: { 
+        id: row.author_id,
+        name: row.author_name 
+      },
+      tags: row.tags || [],
+      votes: voteSum,  // Dynamic vote count
+      answers: row.answers?.[0]?.count || 0,  // Dynamic answer count
+      views: row.views || 0,
+      createdAt: formatRelativeTime(row.created_at),
+      originalLanguage: row.original_language || 'en',
+    };
+  });
 }
 
 /**
@@ -99,7 +104,7 @@ export async function getQuestionById(id) {
 
   const { data, error } = await supabase
     .from('questions')
-    .select('*')
+    .select('*, votes:votes(vote_type)')
     .eq('id', id)
     .single();
 
@@ -108,7 +113,24 @@ export async function getQuestionById(id) {
     return null;
   }
 
-  return transformQuestion(data);
+  // Calculate total votes
+  const voteSum = data.votes?.reduce((sum, v) => sum + (v.vote_type || 0), 0) || 0;
+  
+  return {
+    id: data.id,
+    title: data.title,
+    body: data.body,
+    author: { 
+      id: data.author_id,
+      name: data.author_name 
+    },
+    tags: data.tags || [],
+    votes: voteSum,  // Dynamic vote count
+    answers: data.answers_count || 0,
+    views: data.views || 0,
+    createdAt: formatRelativeTime(data.created_at),
+    originalLanguage: data.original_language || 'en',
+  };
 }
 
 /**

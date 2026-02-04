@@ -1,10 +1,3 @@
-/**
- * Lingo.dev Translation Server
- * 
- * A simple Express server that handles translation requests using the Lingo.dev SDK.
- * This runs separately from the Vite dev server and handles CORS properly.
- */
-
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -24,7 +17,7 @@ app.use(express.json());
 const apiKey = process.env.VITE_LINGODOTDEV_API_KEY;
 
 if (!apiKey) {
-  console.error('❌ Missing VITE_LINGODOTDEV_API_KEY in .env file');
+  console.error('Missing VITE_LINGODOTDEV_API_KEY in .env file');
   process.exit(1);
 }
 
@@ -32,7 +25,7 @@ const lingoDotDev = new LingoDotDevEngine({
   apiKey: apiKey,
 });
 
-console.log('✅ Lingo.dev SDK initialized');
+console.log('Lingo.dev SDK initialized');
 
 // Health check endpoint
 app.get('/health', (req, res) => {

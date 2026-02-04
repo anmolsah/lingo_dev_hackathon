@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HelpCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getQuestions } from '../services/questions';
+import { getMyQuestions } from '../services/questions';
 import QuestionCard from '../components/QuestionCard';
 
 const MyQuestions = () => {
@@ -19,9 +19,7 @@ const MyQuestions = () => {
 
       setLoading(true);
       try {
-        const allQuestions = await getQuestions('newest');
-        // Filter to only show user's questions
-        const myQuestions = allQuestions.filter(q => q.author?.id === user.id);
+        const myQuestions = await getMyQuestions();
         setQuestions(myQuestions);
       } catch (error) {
         console.error('Error fetching questions:', error);

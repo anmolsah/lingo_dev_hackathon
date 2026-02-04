@@ -25,7 +25,10 @@ function transformQuestion(row) {
     id: row.id,
     title: row.title,
     body: row.body,
-    author: { name: row.author_name },
+    author: { 
+      id: row.author_id,
+      name: row.author_name 
+    },
     tags: row.tags || [],
     votes: row.votes || 0,
     answers: row.answers_count || 0,
@@ -44,7 +47,10 @@ export async function getQuestions(filter = 'newest') {
     return [];
   }
 
-  let query = supabase.from('questions').select('*');
+  // Fetch questions with answer count using a subquery
+  let query = supabase
+    .from('questions')
+    .select('*, answers(count)');
 
   switch (filter) {
     case 'trending':
@@ -64,7 +70,22 @@ export async function getQuestions(filter = 'newest') {
     return [];
   }
 
-  return data.map(transformQuestion);
+  // Transform with dynamic answer count
+  return data.map(row => ({
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    author: { 
+      id: row.author_id,
+      name: row.author_name 
+    },
+    tags: row.tags || [],
+    votes: row.votes || 0,
+    answers: row.answers?.[0]?.count || 0,  // Dynamic count from join
+    views: row.views || 0,
+    createdAt: formatRelativeTime(row.created_at),
+    originalLanguage: row.original_language || 'en',
+  }));
 }
 
 /**
@@ -98,12 +119,16 @@ export async function createQuestion(questionData) {
     throw new Error('Supabase not configured. Please add your Supabase credentials to .env');
   }
 
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { data, error } = await supabase
     .from('questions')
     .insert([{
       title: questionData.title,
       body: questionData.body,
-      author_name: questionData.author_name || 'Anonymous',
+      author_id: user?.id,
+      author_name: questionData.author_name || user?.email?.split('@')[0] || 'Anonymous',
       tags: questionData.tags,
       original_language: questionData.original_language || 'en',
     }])
@@ -116,6 +141,29 @@ export async function createQuestion(questionData) {
   }
 
   return transformQuestion(data);
+}
+
+/**
+ * Get questions by the current user
+ */
+export async function getMyQuestions() {
+  if (!supabase) return [];
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('author_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching my questions:', error);
+    return [];
+  }
+
+  return data.map(transformQuestion);
 }
 
 /**

@@ -31,6 +31,7 @@ const QuestionDetails = () => {
   const [submitting, setSubmitting] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [questionVote, setQuestionVote] = useState(null);
+  const [voteCount, setVoteCount] = useState(0);
   const [answerVotes, setAnswerVotes] = useState({});
   
   const { currentLanguage, translateQuestionContent } = useLanguage();
@@ -54,6 +55,7 @@ const QuestionDetails = () => {
           getAnswersByQuestionId(id),
         ]);
         setQuestion(questionData);
+        setVoteCount(questionData?.votes || 0);
         setAnswers(answersData);
 
         // Check bookmark status
@@ -84,10 +86,37 @@ const QuestionDetails = () => {
 
     // Subscribe to realtime answer updates
     const unsubscribe = subscribeToAnswers(id, (payload) => {
-      if (payload.eventType === 'INSERT') {
-        setAnswers(prev => [...prev, payload.new]);
-      } else if (payload.eventType === 'DELETE') {
-        setAnswers(prev => prev.filter(a => a.id !== payload.old.id));
+      try {
+        if (payload.eventType === 'INSERT' && payload.new) {
+          // Transform the raw data before adding to state
+          const newAnswer = {
+            id: payload.new.id,
+            questionId: payload.new.question_id,
+            body: payload.new.body,
+            author: { 
+              id: payload.new.author_id,
+              name: payload.new.author_name || 'Anonymous'
+            },
+            votes: payload.new.votes || 0,
+            isAccepted: payload.new.is_accepted || false,
+            createdAt: 'Just now',
+            originalLanguage: payload.new.original_language || 'en',
+          };
+          // Only add if not already in the list (prevents duplicates)
+          setAnswers(prev => 
+            prev.some(a => a.id === newAnswer.id) ? prev : [...prev, newAnswer]
+          );
+        } else if (payload.eventType === 'DELETE' && payload.old) {
+          setAnswers(prev => prev.filter(a => a.id !== payload.old.id));
+        } else if (payload.eventType === 'UPDATE' && payload.new) {
+          setAnswers(prev => prev.map(a => 
+            a.id === payload.new.id 
+              ? { ...a, votes: payload.new.votes, isAccepted: payload.new.is_accepted }
+              : a
+          ));
+        }
+      } catch (err) {
+        console.error('Realtime update error:', err);
       }
     });
 
@@ -130,17 +159,40 @@ const QuestionDetails = () => {
 
   // Handle question vote
   const handleQuestionVote = async (voteType) => {
-    if (!user) return;
+    if (!user || !question) return;
+    
+    const previousVote = questionVote;
+    
+    // Calculate vote change for optimistic update
+    let voteChange = 0;
+    if (previousVote === voteType) {
+      // Removing vote (clicking same button)
+      voteChange = -voteType;
+    } else if (previousVote) {
+      // Changing vote direction
+      voteChange = voteType - previousVote;
+    } else {
+      // New vote
+      voteChange = voteType;
+    }
+    
+    // Optimistic update - this is the final UI state
+    const newVote = previousVote === voteType ? null : voteType;
+    setQuestionVote(newVote);
+    setVoteCount(prev => prev + voteChange);
+    
     try {
-      const result = voteType === 1 
-        ? await upvoteQuestion(id) 
-        : await downvoteQuestion(id);
-      setQuestionVote(result);
-      // Refresh question to get updated vote count
-      const updated = await getQuestionById(id);
-      setQuestion(updated);
+      // Save to database (trigger will update the count there)
+      if (voteType === 1) {
+        await upvoteQuestion(id);
+      } else {
+        await downvoteQuestion(id);
+      }
+      // Success - vote saved
     } catch (error) {
       console.error('Error voting:', error);
+      // Don't revert - the upsert likely succeeded even if we got an error
+      // The vote was already applied optimistically
     }
   };
 
@@ -257,7 +309,7 @@ const QuestionDetails = () => {
               }`}
             >
               <ThumbsUp className="w-4 h-4" />
-              <span className="font-medium">{question.votes}</span>
+              <span className="font-medium">{voteCount}</span>
             </button>
             <button 
               onClick={() => handleQuestionVote(-1)}

@@ -46,6 +46,7 @@ export async function getAnswerVote(answerId) {
 
 /**
  * Vote on a question (upvote = 1, downvote = -1)
+ * Uses upsert to handle both new votes and updates
  */
 export async function voteQuestion(questionId, voteType) {
   if (!supabase) throw new Error('Supabase not configured');
@@ -53,46 +54,26 @@ export async function voteQuestion(questionId, voteType) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in to vote');
 
-  // Check existing vote
-  const existingVote = await getQuestionVote(questionId);
+  // Use upsert - this will insert if new, update if exists
+  const { data, error } = await supabase
+    .from('votes')
+    .upsert({
+      user_id: user.id,
+      question_id: questionId,
+      vote_type: voteType,
+    }, {
+      onConflict: 'user_id,question_id',
+      ignoreDuplicates: false,
+    })
+    .select()
+    .single();
 
-  if (existingVote === voteType) {
-    // Remove vote if clicking same button
-    const { error } = await supabase
-      .from('votes')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('question_id', questionId);
-
-    if (error) throw error;
-    return null;
-  } else if (existingVote) {
-    // Update existing vote
-    const { data, error } = await supabase
-      .from('votes')
-      .update({ vote_type: voteType })
-      .eq('user_id', user.id)
-      .eq('question_id', questionId)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data.vote_type;
-  } else {
-    // Create new vote
-    const { data, error } = await supabase
-      .from('votes')
-      .insert([{
-        user_id: user.id,
-        question_id: questionId,
-        vote_type: voteType,
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data.vote_type;
+  if (error) {
+    console.error('Vote error:', error);
+    throw error;
   }
+
+  return data?.vote_type;
 }
 
 /**

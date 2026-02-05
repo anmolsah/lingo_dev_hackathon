@@ -1,14 +1,23 @@
 /**
  * Tags Service
- * Handles tag operations
+ * Handles tag operations with caching
  */
 import { supabase } from '../lib/supabase';
+import cache, { TTL } from './cache';
 
 /**
- * Get all tags
+ * Get all tags (with caching)
  */
 export async function getTags() {
   if (!supabase) return [];
+
+  // Check cache
+  const cacheKey = 'tags:all';
+  const cachedTags = cache.get(cacheKey);
+  if (cachedTags) {
+    console.log('🎯 Tags cache hit');
+    return cachedTags;
+  }
 
   const { data, error } = await supabase
     .from('tags')
@@ -20,11 +29,12 @@ export async function getTags() {
     return [];
   }
 
+  cache.set(cacheKey, data, TTL.TAGS);
   return data;
 }
 
 /**
- * Get trending tags (most used)
+ * Get trending tags (most used) with caching
  */
 export async function getTrendingTags(limit = 10) {
   if (!supabase) {
@@ -38,6 +48,14 @@ export async function getTrendingTags(limit = 10) {
     ];
   }
 
+  // Check cache
+  const cacheKey = `tags:trending:${limit}`;
+  const cachedTags = cache.get(cacheKey);
+  if (cachedTags) {
+    console.log('🎯 Trending tags cache hit');
+    return cachedTags;
+  }
+
   const { data, error } = await supabase
     .from('tags')
     .select('*')
@@ -49,6 +67,7 @@ export async function getTrendingTags(limit = 10) {
     return [];
   }
 
+  cache.set(cacheKey, data, TTL.TAGS);
   return data;
 }
 
@@ -89,7 +108,7 @@ export async function getOrCreateTag(name) {
 
   if (existing) return existing;
 
-  // Create new tag
+  // Create new tag - invalidate cache
   const { data, error } = await supabase
     .from('tags')
     .insert([{ name: normalizedName }])
@@ -101,7 +120,18 @@ export async function getOrCreateTag(name) {
     throw error;
   }
 
+  // Invalidate tags cache
+  invalidateTagsCache();
+  
   return data;
+}
+
+/**
+ * Invalidate tags cache
+ */
+export function invalidateTagsCache() {
+  cache.clearByPrefix('tags');
+  console.log('🗑️ Tags cache invalidated');
 }
 
 /**
@@ -153,4 +183,5 @@ export default {
   getOrCreateTag,
   getQuestionsByTag,
   searchTags,
+  invalidateTagsCache,
 };

@@ -2,12 +2,22 @@
  * Lingo.dev Translation Service
  * 
  * Connects to the local Node.js translation server for real-time translations.
+ * Includes caching layer to reduce API calls and improve performance.
  * Falls back to original text if server is unavailable.
  */
+
+import cache, { TTL } from './cache';
 
 // Configuration
 const TRANSLATION_SERVER_URL = 'http://localhost:3001';
 const TRANSLATION_ENABLED = true;
+
+/**
+ * Generate cache key for translations
+ */
+function getCacheKey(content, sourceLocale, targetLocale) {
+  return cache.generateKey('translation', sourceLocale, targetLocale, content);
+}
 
 /**
  * Call the local translation server
@@ -15,6 +25,15 @@ const TRANSLATION_ENABLED = true;
 async function callTranslateServer(content, sourceLocale, targetLocale) {
   if (!TRANSLATION_ENABLED) {
     return null;
+  }
+
+  // Check cache first
+  const cacheKey = getCacheKey(content, sourceLocale, targetLocale);
+  const cachedResult = cache.get(cacheKey);
+  
+  if (cachedResult) {
+    console.log('🎯 Translation cache hit');
+    return cachedResult;
   }
 
   try {
@@ -34,7 +53,13 @@ async function callTranslateServer(content, sourceLocale, targetLocale) {
       return null;
     }
 
-    return await response.json();
+    const result = await response.json();
+    
+    // Cache the successful result
+    cache.set(cacheKey, result, TTL.TRANSLATION);
+    console.log('💾 Translation cached');
+    
+    return result;
   } catch (error) {
     // Server not available - silent fail
     return null;
@@ -82,6 +107,14 @@ export async function translateToMultiple(text, sourceLocale, targetLocales) {
  * Detect the language of a given text
  */
 export async function detectLanguage(text) {
+  // Check cache for language detection
+  const cacheKey = cache.generateKey('detect', text.substring(0, 100));
+  const cachedResult = cache.get(cacheKey);
+  
+  if (cachedResult) {
+    return cachedResult;
+  }
+
   try {
     const response = await fetch(`${TRANSLATION_SERVER_URL}/detect-language`, {
       method: 'POST',
@@ -91,6 +124,7 @@ export async function detectLanguage(text) {
 
     if (response.ok) {
       const result = await response.json();
+      cache.set(cacheKey, result.locale, TTL.TRANSLATION);
       return result.locale;
     }
   } catch {
@@ -98,15 +132,17 @@ export async function detectLanguage(text) {
   }
 
   // Simple heuristic fallback
-  if (/[\u4e00-\u9fa5]/.test(text)) return 'zh';
-  if (/[\u3040-\u309f\u30a0-\u30ff]/.test(text)) return 'ja';
-  if (/[\u0600-\u06ff]/.test(text)) return 'ar';
-  if (/[\u0900-\u097f]/.test(text)) return 'hi';
-  if (/[\uac00-\ud7af]/.test(text)) return 'ko';
-  if (/[áéíóúüñ¿¡]/i.test(text)) return 'es';
-  if (/[àâäçèéêëîïôùûüœæ]/i.test(text)) return 'fr';
-  if (/[äöüß]/i.test(text)) return 'de';
-  return 'en';
+  let locale = 'en';
+  if (/[\u4e00-\u9fa5]/.test(text)) locale = 'zh';
+  else if (/[\u3040-\u309f\u30a0-\u30ff]/.test(text)) locale = 'ja';
+  else if (/[\u0600-\u06ff]/.test(text)) locale = 'ar';
+  else if (/[\u0900-\u097f]/.test(text)) locale = 'hi';
+  else if (/[\uac00-\ud7af]/.test(text)) locale = 'ko';
+  else if (/[áéíóúüñ¿¡]/i.test(text)) locale = 'es';
+  else if (/[àâäçèéêëîïôùûüœæ]/i.test(text)) locale = 'fr';
+  else if (/[äöüß]/i.test(text)) locale = 'de';
+  
+  return locale;
 }
 
 /**
@@ -125,8 +161,17 @@ export async function translateQuestion(question, targetLocale) {
   );
 }
 
+/**
+ * Clear all translation cache
+ */
+export function clearTranslationCache() {
+  cache.clearByPrefix('translation');
+  cache.clearByPrefix('detect');
+  console.log('🗑️ Translation cache cleared');
+}
+
 export function isReady() {
   return TRANSLATION_ENABLED;
 }
 
-export default { translateText, translateObject, translateToMultiple, detectLanguage, translateQuestion, isReady };
+export default { translateText, translateObject, translateToMultiple, detectLanguage, translateQuestion, clearTranslationCache, isReady };

@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import cache, { TTL } from './cache';
 
 /**
  * Format relative time from date
@@ -39,12 +40,21 @@ function transformQuestion(row) {
 }
 
 /**
- * Get all questions
+ * Get all questions (with caching)
  */
 export async function getQuestions(filter = 'newest') {
   if (!supabase) {
     console.warn('Supabase not configured. Please add your Supabase credentials to .env');
     return [];
+  }
+
+  // Check cache first
+  const cacheKey = cache.generateKey('questions', filter);
+  const cachedQuestions = cache.get(cacheKey);
+  
+  if (cachedQuestions) {
+    console.log('🎯 Questions cache hit');
+    return cachedQuestions;
   }
 
   // Fetch questions with answer count and votes
@@ -71,7 +81,7 @@ export async function getQuestions(filter = 'newest') {
   }
 
   // Transform with dynamic counts
-  return data.map(row => {
+  const questions = data.map(row => {
     // Calculate total votes from votes array
     const voteSum = row.votes?.reduce((sum, v) => sum + (v.vote_type || 0), 0) || 0;
     
@@ -91,6 +101,12 @@ export async function getQuestions(filter = 'newest') {
       originalLanguage: row.original_language || 'en',
     };
   });
+
+  // Cache the results
+  cache.set(cacheKey, questions, TTL.QUESTIONS);
+  console.log('💾 Questions cached');
+  
+  return questions;
 }
 
 /**
@@ -100,6 +116,15 @@ export async function getQuestionById(id) {
   if (!supabase) {
     console.warn('Supabase not configured');
     return null;
+  }
+
+  // Check cache first
+  const cacheKey = cache.generateKey('question', id);
+  const cachedQuestion = cache.get(cacheKey);
+  
+  if (cachedQuestion) {
+    console.log('🎯 Question cache hit');
+    return cachedQuestion;
   }
 
   const { data, error } = await supabase
@@ -116,7 +141,7 @@ export async function getQuestionById(id) {
   // Calculate total votes
   const voteSum = data.votes?.reduce((sum, v) => sum + (v.vote_type || 0), 0) || 0;
   
-  return {
+  const question = {
     id: data.id,
     title: data.title,
     body: data.body,
@@ -131,6 +156,11 @@ export async function getQuestionById(id) {
     createdAt: formatRelativeTime(data.created_at),
     originalLanguage: data.original_language || 'en',
   };
+
+  // Cache with short TTL (questions can change frequently)
+  cache.set(cacheKey, question, TTL.QUESTIONS);
+  
+  return question;
 }
 
 /**
@@ -162,7 +192,19 @@ export async function createQuestion(questionData) {
     throw error;
   }
 
+  // Invalidate questions cache when new question is created
+  invalidateQuestionsCache();
+
   return transformQuestion(data);
+}
+
+/**
+ * Invalidate all questions cache
+ */
+export function invalidateQuestionsCache() {
+  cache.clearByPrefix('questions');
+  cache.clearByPrefix('question');
+  console.log('🗑️ Questions cache invalidated');
 }
 
 /**
@@ -173,6 +215,14 @@ export async function getMyQuestions() {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
+
+  // Check cache
+  const cacheKey = cache.generateKey('myquestions', user.id);
+  const cachedQuestions = cache.get(cacheKey);
+  
+  if (cachedQuestions) {
+    return cachedQuestions;
+  }
 
   const { data, error } = await supabase
     .from('questions')
@@ -185,7 +235,10 @@ export async function getMyQuestions() {
     return [];
   }
 
-  return data.map(transformQuestion);
+  const questions = data.map(transformQuestion);
+  cache.set(cacheKey, questions, TTL.QUESTIONS);
+  
+  return questions;
 }
 
 /**
@@ -200,6 +253,8 @@ export function subscribeToQuestions(callback) {
   const subscription = supabase
     .channel('questions')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'questions' }, (payload) => {
+      // Invalidate cache on realtime updates
+      invalidateQuestionsCache();
       callback(payload);
     })
     .subscribe();

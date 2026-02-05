@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Globe, HelpCircle, Bookmark, Plus, Users, Loader2 } from 'lucide-react';
+import { Home, Globe, HelpCircle, Bookmark, Plus, Users, Loader2, Menu, X } from 'lucide-react';
 import { getUserCommunities } from '../services/communities';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,7 +11,7 @@ const defaultCommunities = [
   { code: 'ES', name: 'Español', color: 'bg-red-500' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onToggle }) => {
   const location = useLocation();
   const { user } = useAuth();
   const [communities, setCommunities] = useState([]);
@@ -23,6 +23,13 @@ const Sidebar = () => {
     { icon: HelpCircle, label: 'My Questions', path: '/my-questions' },
     { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
   ];
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    if (isOpen && onToggle) {
+      onToggle();
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     async function fetchCommunities() {
@@ -51,7 +58,22 @@ const Sidebar = () => {
   }, [user]);
 
   return (
-    <aside className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside className={`
+        w-64 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50
+        transition-transform duration-300 ease-in-out
+        lg:translate-x-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
       {/* Logo */}
       <div className="p-6 border-b border-gray-100">
         <Link to="/dashboard" className="flex items-center gap-2">
@@ -133,7 +155,9 @@ const Sidebar = () => {
         </Link>
       </div>
     </aside>
+    </>
   );
 };
 
 export default Sidebar;
+

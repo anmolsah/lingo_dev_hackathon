@@ -104,41 +104,41 @@ const AskQuestion = () => {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Ask a Question</h1>
-        <p className="text-gray-500 mt-1">Get help from the multilingual community. Be specific and clear.</p>
+      <div className="mb-4 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Ask a Question</h1>
+        <p className="text-gray-500 mt-1 text-sm sm:text-base">Get help from the multilingual community. Be specific and clear.</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         {/* Main Form */}
-        <form onSubmit={handleSubmit} className="flex-1 space-y-6">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-4 sm:space-y-6">
           {/* Language Selection */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
               <Globe className="w-4 h-4 text-blue-500" />
               What language are you writing in?
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
               {languages.map((lang) => (
                 <button
                   key={lang.code}
                   type="button"
                   onClick={() => setFormData({ ...formData, language: lang.code })}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                  className={`flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 rounded-xl border transition-all text-sm ${
                     formData.language === lang.code
                       ? 'border-blue-500 bg-blue-50 text-blue-600'
                       : 'border-gray-200 text-gray-600 hover:border-gray-300'
                   }`}
                 >
                   <span>{lang.flag}</span>
-                  <span className="text-sm font-medium">{lang.name}</span>
+                  <span className="font-medium">{lang.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Title */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Title
             </label>
@@ -150,13 +150,13 @@ const AskQuestion = () => {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g. How do I handle async/await in JavaScript?"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm sm:text-base"
               required
             />
           </div>
 
           {/* Body */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               What are the details of your problem?
             </label>
@@ -165,23 +165,23 @@ const AskQuestion = () => {
             </p>
             
             {/* Editor Toolbar */}
-            <div className="flex items-center gap-1 p-2 bg-gray-50 rounded-t-xl border border-gray-200 border-b-0">
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+            <div className="flex items-center gap-1 p-2 bg-gray-50 rounded-t-xl border border-gray-200 border-b-0 overflow-x-auto">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <Bold className="w-4 h-4 text-gray-600" />
               </button>
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <Italic className="w-4 h-4 text-gray-600" />
               </button>
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <Code className="w-4 h-4 text-gray-600" />
               </button>
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <LinkIcon className="w-4 h-4 text-gray-600" />
               </button>
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <List className="w-4 h-4 text-gray-600" />
               </button>
-              <button type="button" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <button type="button" className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                 <Image className="w-4 h-4 text-gray-600" />
               </button>
             </div>
@@ -189,15 +189,15 @@ const AskQuestion = () => {
             <textarea
               value={formData.body}
               onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-              rows={8}
+              rows={6}
               placeholder="Describe your question in detail..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm sm:text-base"
               required
             />
           </div>
 
           {/* Tags */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <Tag className="w-4 h-4 text-blue-500" />
               Tags
@@ -210,7 +210,7 @@ const AskQuestion = () => {
               {formData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm"
+                  className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs sm:text-sm"
                 >
                   #{tag}
                   <button
@@ -229,7 +229,7 @@ const AskQuestion = () => {
                 onKeyDown={handleAddTag}
                 placeholder={formData.tags.length < 5 ? 'Add a tag...' : 'Max 5 tags'}
                 disabled={formData.tags.length >= 5}
-                className="flex-1 min-w-[120px] outline-none text-sm"
+                className="flex-1 min-w-[100px] outline-none text-sm"
               />
             </div>
           </div>
@@ -242,11 +242,11 @@ const AskQuestion = () => {
           )}
 
           {/* Submit */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
@@ -264,15 +264,15 @@ const AskQuestion = () => {
               type="button"
               onClick={() => navigate('/dashboard')}
               disabled={isSubmitting}
-              className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
+              className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50 text-center"
             >
               Discard
             </button>
           </div>
         </form>
 
-        {/* Guidelines Sidebar */}
-        <aside className="w-80">
+        {/* Guidelines Sidebar - hidden on mobile */}
+        <aside className="hidden lg:block w-80 flex-shrink-0">
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-5 sticky top-24">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
               <Lightbulb className="w-5 h-5 text-amber-500" />

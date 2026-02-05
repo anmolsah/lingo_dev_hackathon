@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Bell, ChevronDown, Globe, Loader2, X } from 'lucide-react';
+import { Search, Bell, ChevronDown, Globe, Loader2, X, Menu } from 'lucide-react';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getNotifications, getUnreadCount, markAsRead, markAllAsRead, subscribeToNotifications } from '../services/notifications';
 
-const Header = () => {
+const Header = ({ onMenuToggle }) => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -74,24 +74,33 @@ const Header = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 fixed top-0 left-64 right-0 z-10">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 fixed top-0 left-0 lg:left-64 right-0 z-30">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={onMenuToggle}
+        className="p-2 text-gray-500 hover:bg-gray-100 rounded-xl lg:hidden mr-2"
+        aria-label="Toggle menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
       {/* Search Bar */}
       <div className="flex-1 max-w-2xl">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search questions, tags, or communities..."
-            className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            placeholder="Search..."
+            className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm sm:text-base"
           />
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-4 ml-6">
-        {/* Translation Indicator */}
+      <div className="flex items-center gap-2 sm:gap-4 ml-2 sm:ml-6">
+        {/* Translation Indicator - hidden on mobile */}
         {isTranslating && (
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Translating...</span>
           </div>
@@ -101,11 +110,12 @@ const Header = () => {
         <div className="relative">
           <button
             onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
           >
             <Globe className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">{selectedLang.flag} {selectedLang.name}</span>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+            <span className="text-sm font-medium text-gray-700 hidden sm:inline">{selectedLang.flag} {selectedLang.name}</span>
+            <span className="text-sm sm:hidden">{selectedLang.flag}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform hidden sm:block ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isLangDropdownOpen && (
@@ -225,13 +235,13 @@ const Header = () => {
         {/* Profile */}
         <Link 
           to="/profile"
-          className="flex items-center gap-3 pl-3 pr-4 py-2 hover:bg-gray-50 rounded-xl transition-colors"
+          className="flex items-center gap-1 sm:gap-3 pl-2 sm:pl-3 pr-2 sm:pr-4 py-2 hover:bg-gray-50 rounded-xl transition-colors"
         >
           <div className="w-8 h-8 bg-gradient-to-br from-[#137fec] to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {initials}
           </div>
-          <span className="text-sm font-medium text-gray-700">{displayName}</span>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+          <span className="text-sm font-medium text-gray-700 hidden sm:block">{displayName}</span>
+          <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
         </Link>
       </div>
     </header>

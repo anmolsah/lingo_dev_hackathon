@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lingo.dev Logo SVG - Green arrow icon -->
+  <g transform="translate(0, 5)">
+    <!-- Back arrow shape (darker green) -->
+    <path d="M8 28L20 40L32 28L24 28L24 16L16 16L16 28L8 28Z" fill="#4ADE80"/>
+    <!-- Front arrow shape (brighter green) -->
+    <path d="M16 12L28 24L40 12L32 12L32 0L24 0L24 12L16 12Z" fill="#22C55E"/>
+  </g>
+  <!-- Text "Lingo.dev" -->
+  <text x="50" y="32" font-family="Inter, -apple-system, sans-serif" font-size="22" font-weight="500" fill="currentColor">Lingo.dev</text>
+</svg>

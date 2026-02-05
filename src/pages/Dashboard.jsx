@@ -4,6 +4,7 @@ import QuestionCard from '../components/QuestionCard';
 import TrendingTags from '../components/TrendingTags';
 import { useLanguage } from '../context/LanguageContext';
 import { getQuestions, subscribeToQuestions } from '../services/questions';
+import lingoDevLogo from '../assets/image.png';
 
 const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState('newest');
@@ -72,21 +73,21 @@ const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Discover questions from the global community</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-500 mt-1 text-sm sm:text-base">Discover questions from the global community</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         {/* Main Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Filters */}
-          <div className="flex items-center gap-2 mb-4 p-1 bg-white rounded-xl border border-gray-200 w-fit">
+          <div className="flex items-center gap-1 sm:gap-2 mb-4 p-1 bg-white rounded-xl border border-gray-200 w-full sm:w-fit overflow-x-auto">
             {filters.map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                   activeFilter === filter.id
                     ? 'bg-blue-500 text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-50'
@@ -107,7 +108,7 @@ const Dashboard = () => {
 
           {/* Questions List */}
           {!loading && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {questions.map((question) => (
                 <QuestionCard 
                   key={question.id} 
@@ -125,8 +126,8 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Sidebar */}
-        <aside className="w-80 space-y-4">
+        {/* Sidebar - hidden on mobile, shown on lg and above */}
+        <aside className="hidden lg:block w-80 space-y-4 flex-shrink-0">
           <TrendingTags />
           
           {/* Language Stats Widget */}
@@ -150,12 +151,12 @@ const Dashboard = () => {
 
           {/* Lingo.dev Powered Badge */}
           <div className="bg-white rounded-2xl border border-gray-200 p-4 text-center">
-            <p className="text-xs text-gray-400 mb-2">Powered by</p>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-lg">🔤</span>
-              <span className="font-semibold text-gray-900">Lingo.dev</span>
+            <p className="text-xs text-gray-400 mb-3">Powered by</p>
+            <div className="flex items-center justify-center">
+              {/* Lingo.dev Logo Icon */}
+              <img src={lingoDevLogo} alt="Lingo.dev" className="h-10" />
             </div>
-            <p className="text-xs text-gray-500 mt-2">Real-time AI translations</p>
+            <p className="text-xs text-gray-500 mt-3">Real-time AI translations</p>
           </div>
         </aside>
       </div>

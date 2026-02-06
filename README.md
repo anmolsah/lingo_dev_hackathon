@@ -1,168 +1,107 @@
-# 🌍 PolyConnect - Multilingual Community Q&A
+# BabelChat
 
-> **Break language barriers. Connect globally.**
+BabelChat is a real-time multilingual chat application that automatically translates messages between users speaking different languages. It enables seamless cross-language conversations powered by AI translation.
 
-PolyConnect is a multilingual Q&A platform where users can ask and answer questions in their native language, and content is automatically translated for everyone using **Lingo.dev SDK**.
+## Features
 
-Built for the [Lingo.dev Hackathon](https://github.com/lingodotdev/lingo.dev) 🚀
+- **Real-Time Messaging** -- Messages appear instantly for all room members via WebSocket subscriptions.
+- **Automatic Translation** -- Messages are translated on the fly based on each user's preferred language. Users can toggle between the original text and the translation.
+- **Public and Private Rooms** -- Create public rooms that anyone can browse and join, or private rooms accessible only through a unique invite code.
+- **Typing Indicators** -- See when other participants are composing a message.
+- **Live Member Count** -- Room member counts update in real time as users join or leave.
+- **User Profiles** -- Each user has a display name and a preferred language that determines how incoming messages are translated.
+- **Internationalized Interface** -- The entire UI is available in all six supported languages.
 
-![PolyConnect Screenshot](./screenshots/dashboard.png)
+## Supported Languages
 
-## ✨ Features
+| Language | Code |
+|----------|------|
+| English  | en   |
+| Spanish  | es   |
+| French   | fr   |
+| German   | de   |
+| Japanese | ja   |
+| Hindi    | hi   |
 
-- 🌐 **Real-time Translation**: Questions and answers are translated on-the-fly using Lingo.dev SDK
-- 🗣️ **Multi-language Support**: Write in your preferred language (English, Spanish, Hindi, German, French, Japanese, and more)
-- 💬 **Community Q&A**: Ask questions, share knowledge, upvote helpful answers
-- 🏷️ **Tags & Communities**: Organize content by topics and programming languages
-- 🔔 **Translation Indicator**: Know when content has been translated from another language
-- ⚡ **Live Updates**: Real-time question feed powered by Supabase
+## Tech Stack
 
-## 🛠️ Tech Stack
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Frontend   | React 18, TypeScript, Tailwind CSS  |
+| Build Tool | Vite                                |
+| Backend    | Supabase (PostgreSQL, Auth, Realtime, Edge Functions) |
+| Translation| Lingo.dev AI Engine                 |
+| Icons      | Lucide React                        |
 
-| Layer           | Technology            |
-| --------------- | --------------------- |
-| Frontend        | React 19, Vite        |
-| Styling         | Tailwind CSS 4        |
-| Icons           | Lucide React          |
-| Routing         | React Router DOM      |
-| **Translation** | **🔤 Lingo.dev SDK**  |
-| Database        | Supabase (PostgreSQL) |
-| Realtime        | Supabase Realtime     |
+## Project Structure
 
-## 🚀 Quick Start
+```
+src/
+  components/       UI components (chat area, sidebar, modals, etc.)
+  contexts/         React context providers (authentication)
+  lib/              Supabase client, translation service, i18n strings, language definitions
+  types/            TypeScript type definitions
+supabase/
+  functions/        Supabase Edge Functions (translate)
+  migrations/       Database migration files
+```
 
-### Prerequisites
+## How It Works
 
-- Node.js 18+
-- npm or yarn
-- Lingo.dev API Key (get one at [lingo.dev](https://lingo.dev))
-- Supabase account (optional, for persistence)
+### Translation
 
-### Installation
+When a message is sent, it is stored with the sender's preferred language. When another user views the message, the application checks whether a translation is needed. If the source language differs from the reader's preferred language, a translation request is sent to a Supabase Edge Function that calls the Lingo.dev API. Translated results are cached in the database to avoid redundant API calls.
+
+### Rooms
+
+- **Public rooms** are visible in the browse modal and can be joined by any authenticated user.
+- **Private rooms** are hidden from the browse list. Users must enter the room's invite code to join.
+- Every room is assigned a unique invite code at creation, which can be copied and shared from the room header.
+
+### Real-Time Updates
+
+The application subscribes to Supabase Realtime channels for each active room. This powers:
+
+- Instant message delivery
+- Typing indicators via broadcast events
+- Live member count changes when users join or leave
+
+## Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```
+VITE_SUPABASE_URL=<your-supabase-project-url>
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+VITE_LINGODOTDEV_API_KEY=<your-lingodotdev-api-key>
+```
+
+## Getting Started
+
+1. Install dependencies:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/polyconnect.git
-cd polyconnect
-
-# Install dependencies
 npm install
-
-# Copy environment variables
-cp .env.example .env
 ```
 
-### Configure Environment
+2. Set up your `.env` file with the required environment variables listed above.
 
-Edit `.env` with your API keys:
+3. Run database migrations through the Supabase dashboard or CLI.
 
-```env
-# Lingo.dev API Key (REQUIRED for translations)
-VITE_LINGODOTDEV_API_KEY=your_lingo_dev_api_key
-
-# Supabase (optional - app works with mock data if not set)
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### Run Development Server
+4. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+## Build
 
-## 🔤 Lingo.dev Integration
-
-PolyConnect uses the **Lingo.dev SDK** for real-time translation of user-generated content:
-
-### Translation Service (`src/services/translation.js`)
-
-```javascript
-import { LingoDotDevEngine } from "lingo.dev/sdk";
-
-const lingoDotDev = new LingoDotDevEngine({
-  apiKey: import.meta.env.VITE_LINGODOTDEV_API_KEY,
-});
-
-// Translate question content
-export async function translateQuestion(question, targetLocale) {
-  const translated = await lingoDotDev.localizeObject(
-    { title: question.title, body: question.body },
-    { sourceLocale: question.originalLanguage, targetLocale },
-  );
-  return translated;
-}
+```bash
+npm run build
 ```
 
-### Language Context (`src/context/LanguageContext.jsx`)
+The production build is output to the `dist/` directory.
 
-- Manages current language state
-- Caches translations for performance
-- Provides `translate()` and `translateQuestionContent()` hooks
+## License
 
-### How It Works
-
-1. User selects their preferred language from the header dropdown
-2. When language changes, questions are translated via Lingo.dev SDK
-3. Translated content is displayed with a "Translated from 🇪🇸" indicator
-4. Original language is preserved in the database
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── Header.jsx       # Navbar with language switcher
-│   ├── Sidebar.jsx      # Navigation sidebar
-│   ├── Layout.jsx       # Page layout wrapper
-│   ├── QuestionCard.jsx # Question preview card
-│   └── TrendingTags.jsx # Trending tags widget
-├── pages/
-│   ├── Dashboard.jsx    # Home page with question feed
-│   ├── AskQuestion.jsx  # Create new question form
-│   └── QuestionDetails.jsx # Question page with answers
-├── context/
-│   └── LanguageContext.jsx # Language state & translation
-├── services/
-│   ├── translation.js   # Lingo.dev SDK wrapper
-│   └── questions.js     # Question CRUD operations
-└── lib/
-    └── supabase.js      # Supabase client
-```
-
-## 🗄️ Database Schema
-
-Run `supabase/schema.sql` in your Supabase SQL Editor to set up the tables:
-
-- `questions`: title, body, author, tags, original_language, votes
-- `answers`: body, question_id, author, original_language, votes
-
-## 🎯 Demo
-
-### Watch the Demo Video
-
-[▶️ Watch Demo Video](./demo/video.mp4)
-
-### Features Demonstrated
-
-1. **Language Switching**: Change language in header, see content translate
-2. **Multi-language Questions**: Questions in English, Spanish, Hindi
-3. **Ask a Question**: Create new question with language selection
-4. **Translation Indicators**: Shows when content is translated
-
-## 📜 License
-
-MIT License - feel free to use this for your own projects!
-
-## 🙏 Acknowledgments
-
-- [Lingo.dev](https://lingo.dev) - AI-powered translation SDK
-- [Supabase](https://supabase.com) - Backend as a service
-- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS
-- [Lucide](https://lucide.dev) - Beautiful icons
-
----
-
-**Built with ❤️ for the Lingo.dev Hackathon**
+This project is provided as-is for evaluation purposes.

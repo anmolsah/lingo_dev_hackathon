@@ -27,6 +27,12 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
   const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const profileRef = useRef(profile);
+
+  // Keep profile ref updated
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,7 +60,7 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
         return next;
       });
     },
-    []
+    [setMessages, setTranslatingIds]
   );
 
   useEffect(() => {
@@ -133,7 +139,11 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
     }
 
     const channel = supabase
-      .channel(`room:${roomId}`)
+      .channel(`room:${roomId}`, {
+        config: {
+          broadcast: { self: false },
+        },
+      })
       .on(
         'postgres_changes',
         {
@@ -169,28 +179,26 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
         async (payload) => {
           const newMsg = payload.new as Message;
 
-          let sender = profiles.get(newMsg.sender_id);
-          if (!sender) {
-            const { data } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', newMsg.sender_id)
-              .maybeSingle();
-            if (data) {
-              sender = data;
-              setProfiles((prev) => new Map(prev).set(data.id, data));
-            }
+          // Fetch sender profile
+          const { data: senderData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', newMsg.sender_id)
+            .maybeSingle();
+
+          if (senderData) {
+            setProfiles((prev) => new Map(prev).set(senderData.id, senderData));
           }
 
           const msgWithSender: MessageWithSender = {
             ...newMsg,
-            sender,
+            sender: senderData ?? undefined,
           };
 
           setMessages((prev) => [...prev, msgWithSender]);
           setTimeout(scrollToBottom, 50);
 
-          const userLang = profile?.preferred_language || 'en';
+          const userLang = profileRef.current?.preferred_language || 'en';
           if (newMsg.source_language !== userLang) {
             translateAndUpdate(msgWithSender, userLang);
           }
@@ -212,14 +220,20 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
           });
         }, 3000);
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Realtime subscription active for room:', roomId);
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Realtime subscription error for room:', roomId);
+        }
+      });
 
     channelRef.current = channel;
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, profile?.preferred_language, user?.id, translateAndUpdate]);
+  }, [roomId, user?.id]);
 
   const handleSend = async (content: string) => {
     if (!user || !profile) return;

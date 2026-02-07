@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Hash, Users, Loader2, MessageSquareOff, Link, Check, Globe, Lock, Menu } from 'lucide-react';
+import { Hash, Users, Loader2, MessageSquareOff, Link, Check, Globe, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { translateMessage } from '../lib/translate';
@@ -179,6 +179,11 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
         async (payload) => {
           const newMsg = payload.new as Message;
 
+          // Skip our own messages - they're already added optimistically
+          if (newMsg.sender_id === user?.id) {
+            return;
+          }
+
           // Fetch sender profile
           const { data: senderData } = await supabase
             .from('profiles')
@@ -195,9 +200,17 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
             sender: senderData ?? undefined,
           };
 
-          setMessages((prev) => [...prev, msgWithSender]);
+          // Add message to state (with duplicate check)
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) {
+              return prev;
+            }
+            return [...prev, msgWithSender];
+          });
+
           setTimeout(scrollToBottom, 50);
 
+          // Translate if needed
           const userLang = profileRef.current?.preferred_language || 'en';
           if (newMsg.source_language !== userLang) {
             translateAndUpdate(msgWithSender, userLang);
@@ -220,10 +233,30 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
           });
         }, 3000);
       })
+      .on('broadcast', { event: 'new_message' }, (payload) => {
+        const { message } = payload.payload as { message: MessageWithSender };
+        
+        // Skip our own messages
+        if (message.sender_id === user?.id) return;
+
+        // Add message to state (with duplicate check)
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === message.id)) {
+            return prev;
+          }
+          return [...prev, message];
+        });
+
+        setTimeout(scrollToBottom, 50);
+
+        // Translate if needed
+        const userLang = profileRef.current?.preferred_language || 'en';
+        if (message.source_language !== userLang) {
+          translateAndUpdate(message, userLang);
+        }
+      })
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Realtime subscription active for room:', roomId);
-        } else if (status === 'CHANNEL_ERROR') {
+        if (status === 'CHANNEL_ERROR') {
           console.error('Realtime subscription error for room:', roomId);
         }
       });
@@ -238,12 +271,48 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
   const handleSend = async (content: string) => {
     if (!user || !profile) return;
 
-    await supabase.from('messages').insert({
+    // Create optimistic message to show immediately
+    const optimisticMsg: MessageWithSender = {
+      id: crypto.randomUUID(), // Temporary ID
       room_id: roomId,
       sender_id: user.id,
       content,
       source_language: profile.preferred_language,
-    });
+      created_at: new Date().toISOString(),
+      sender: profile,
+    };
+
+    // Add message to UI immediately (optimistic update)
+    setMessages((prev) => [...prev, optimisticMsg]);
+    setTimeout(scrollToBottom, 50);
+
+    // Insert into database
+    const { data, error } = await supabase.from('messages').insert({
+      room_id: roomId,
+      sender_id: user.id,
+      content,
+      source_language: profile.preferred_language,
+    }).select().single();
+
+    // If successful, replace optimistic message with real one (with actual ID)
+    if (data && !error) {
+      setMessages((prev) => 
+        prev.map((msg) => 
+          msg.id === optimisticMsg.id 
+            ? { ...data, sender: profile } 
+            : msg
+        )
+      );
+
+      // Broadcast to other clients (more reliable than postgres_changes)
+      channelRef.current?.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: {
+          message: { ...data, sender: profile },
+        },
+      });
+    }
   };
 
   const handleTyping = () => {

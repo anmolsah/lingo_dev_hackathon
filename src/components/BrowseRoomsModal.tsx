@@ -61,10 +61,10 @@ export default function BrowseRoomsModal({ onClose, onJoined, locale }: BrowseRo
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg animate-in flex flex-col max-h-[80vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 w-full sm:max-w-lg animate-in flex flex-col max-h-[85vh] sm:max-h-[80vh]">
+        <div className="sticky top-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100 bg-white rounded-t-2xl z-10">
           <div className="flex items-center gap-2.5">
             <Globe className="w-5 h-5 text-teal-500" />
             <h2 className="text-lg font-semibold text-slate-900">
@@ -79,7 +79,7 @@ export default function BrowseRoomsModal({ onClose, onJoined, locale }: BrowseRo
           </button>
         </div>
 
-        <div className="px-6 py-3 border-b border-slate-100">
+        <div className="px-4 sm:px-6 py-3 border-b border-slate-100">
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
@@ -112,10 +112,10 @@ export default function BrowseRoomsModal({ onClose, onJoined, locale }: BrowseRo
                 return (
                   <div
                     key={room.id}
-                    className="flex items-center gap-4 px-4 py-3.5 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/50 transition-all duration-150"
+                    className="flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/50 transition-all duration-150"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                      <Hash className="w-4.5 h-4.5 text-slate-500" />
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                      <Hash className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-semibold text-slate-900 truncate">
@@ -135,22 +135,22 @@ export default function BrowseRoomsModal({ onClose, onJoined, locale }: BrowseRo
                     </div>
                     <div className="flex-shrink-0">
                       {isJoined ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 text-teal-600 text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-teal-50 text-teal-600 text-xs font-medium">
                           <Check className="w-3.5 h-3.5" />
-                          {t('browse.joined', locale)}
+                          <span className="hidden sm:inline">{t('browse.joined', locale)}</span>
                         </span>
                       ) : (
                         <button
                           onClick={() => handleJoin(room.id)}
                           disabled={isJoining}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-xs font-semibold hover:shadow-md hover:shadow-teal-500/20 transition-all duration-200 disabled:opacity-60"
+                          className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-xs font-semibold hover:shadow-md hover:shadow-teal-500/20 transition-all duration-200 disabled:opacity-60"
                         >
                           {isJoining ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           ) : (
                             <LogIn className="w-3.5 h-3.5" />
                           )}
-                          {t('browse.join', locale)}
+                          <span className="hidden sm:inline">{t('browse.join', locale)}</span>
                         </button>
                       )}
                     </div>

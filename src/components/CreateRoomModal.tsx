@@ -53,10 +53,10 @@ export default function CreateRoomModal({ onClose, onCreated, locale }: CreateRo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md animate-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 w-full sm:max-w-md animate-in max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100 bg-white rounded-t-2xl">
           <h2 className="text-lg font-semibold text-slate-900">
             {t('room.newRoom', locale)}
           </h2>
@@ -69,12 +69,12 @@ export default function CreateRoomModal({ onClose, onCreated, locale }: CreateRo
         </div>
 
         {error && (
-          <div className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          <div className="mx-4 sm:mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {t('room.name', locale)}
@@ -114,7 +114,7 @@ export default function CreateRoomModal({ onClose, onCreated, locale }: CreateRo
               <button
                 type="button"
                 onClick={() => setIsPublic(true)}
-                className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
+                className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
                   isPublic
                     ? 'border-teal-500 bg-teal-50 text-teal-700'
                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -126,7 +126,7 @@ export default function CreateRoomModal({ onClose, onCreated, locale }: CreateRo
               <button
                 type="button"
                 onClick={() => setIsPublic(false)}
-                className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
+                className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
                   !isPublic
                     ? 'border-teal-500 bg-teal-50 text-teal-700'
                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'

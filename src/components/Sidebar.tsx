@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Hash, Plus, LogOut, Settings, Loader2, Compass, KeyRound, Globe, Lock } from 'lucide-react';
+import { Hash, Plus, LogOut, Settings, Loader2, Compass, KeyRound, Globe, Lock, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { t } from '../lib/i18n';
@@ -15,9 +15,11 @@ interface SidebarProps {
   selectedRoomId: string | null;
   onSelectRoom: (roomId: string) => void;
   locale: LanguageCode;
+  onClose?: () => void;
+  isMobile?: boolean;
 }
 
-export default function Sidebar({ selectedRoomId, onSelectRoom, locale }: SidebarProps) {
+export default function Sidebar({ selectedRoomId, onSelectRoom, locale, onClose, isMobile }: SidebarProps) {
   const { user, profile, signOut, updateProfile } = useAuth();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,13 +81,24 @@ export default function Sidebar({ selectedRoomId, onSelectRoom, locale }: Sideba
 
   return (
     <>
-      <div className="w-72 bg-white border-r border-slate-200 flex flex-col h-full">
+      <div className="w-full sm:w-72 bg-white border-r border-slate-200 flex flex-col h-full">
         <div className="px-5 py-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
-              <Hash className="w-4 h-4 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+                <Hash className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-bold text-slate-900 tracking-tight">BabelChat</span>
             </div>
-            <span className="text-lg font-bold text-slate-900 tracking-tight">BabelChat</span>
+            {/* Close button for mobile */}
+            {isMobile && onClose && (
+              <button
+                onClick={onClose}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors sm:hidden"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -124,7 +137,7 @@ export default function Sidebar({ selectedRoomId, onSelectRoom, locale }: Sideba
               <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
             </div>
           ) : (
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 max-h-[40vh] sm:max-h-none overflow-y-auto">
               {rooms.map((room) => (
                 <button
                   key={room.id}

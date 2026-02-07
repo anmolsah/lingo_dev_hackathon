@@ -34,31 +34,31 @@ export default function AuthPage({ onBack }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-100 rounded-full blur-3xl opacity-40" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-cyan-100 rounded-full blur-3xl opacity-40" />
+        <div className="absolute -top-20 sm:-top-40 -right-20 sm:-right-40 w-48 sm:w-96 h-48 sm:h-96 bg-teal-100 rounded-full blur-3xl opacity-40" />
+        <div className="absolute -bottom-20 sm:-bottom-40 -left-20 sm:-left-40 w-48 sm:w-96 h-48 sm:h-96 bg-cyan-100 rounded-full blur-3xl opacity-40" />
       </div>
 
       <div className="w-full max-w-md relative">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-8 transition-colors"
+          className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8">
           <div className="flex items-center justify-center gap-2.5 mb-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
               <MessageSquare className="w-5 h-5 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 text-center mb-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-1">
             {isLogin ? t('auth.signIn') : t('auth.signUp')}
           </h1>
-          <p className="text-sm text-slate-500 text-center mb-8">
+          <p className="text-sm text-slate-500 text-center mb-6 sm:mb-8">
             {isLogin
               ? 'Welcome back to BabelChat'
               : 'Join the multilingual conversation'}

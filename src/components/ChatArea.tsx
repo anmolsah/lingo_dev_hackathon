@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Hash, Users, Loader2, MessageSquareOff, Link, Check, Globe, Lock } from 'lucide-react';
+import { Hash, Users, Loader2, MessageSquareOff, Link, Check, Globe, Lock, Menu } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { translateMessage } from '../lib/translate';
@@ -269,40 +269,39 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50">
-      <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
-            <Hash className="w-4.5 h-4.5 text-slate-500" />
+      <div className="px-3 sm:px-6 py-3 sm:py-3.5 bg-white border-b border-slate-200 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <Hash className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-500" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {room?.name || '...'}
               </h2>
               {room && (
                 room.is_public
-                  ? <Globe className="w-3.5 h-3.5 text-slate-400" />
-                  : <Lock className="w-3.5 h-3.5 text-slate-400" />
+                  ? <Globe className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                  : <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
               )}
             </div>
             {room?.description && (
-              <p className="text-xs text-slate-500 truncate max-w-md">
+              <p className="text-xs text-slate-500 truncate max-w-[150px] sm:max-w-md">
                 {room.description}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-slate-500">
             <Users className="w-4 h-4" />
-            <span>
-              {memberCount} {t('chat.members', locale)}
-            </span>
+            <span className="hidden xs:inline">{memberCount} {t('chat.members', locale)}</span>
+            <span className="xs:hidden">{memberCount}</span>
           </div>
           <div className="relative">
             <button
               onClick={() => setShowInvite(!showInvite)}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                 showInvite ? 'bg-teal-50 text-teal-600' : 'hover:bg-slate-100 text-slate-400'
               }`}
               title={t('invite.code', locale)}
@@ -310,17 +309,17 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
               <Link className="w-4 h-4" />
             </button>
             {showInvite && room && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 p-4 z-10 animate-in">
+              <div className="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white rounded-xl shadow-xl border border-slate-200 p-3 sm:p-4 z-10 animate-in">
                 <p className="text-xs font-medium text-slate-500 mb-2">
                   {t('invite.code', locale)}
                 </p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono tracking-wider text-slate-800">
+                  <code className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm font-mono tracking-wider text-slate-800 truncate">
                     {room.invite_code}
                   </code>
                   <button
                     onClick={handleCopyInviteCode}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
+                    className={`p-2 rounded-lg transition-all duration-200 flex-shrink-0 ${
                       copied
                         ? 'bg-teal-50 text-teal-600'
                         : 'hover:bg-slate-100 text-slate-400'
@@ -329,7 +328,7 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
                     {copied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-2">
+                <p className="text-[10px] sm:text-[11px] text-slate-400 mt-2">
                   {copied ? t('invite.copied', locale) : t('invite.share', locale)}
                 </p>
               </div>
@@ -338,7 +337,7 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-3 sm:py-4">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
@@ -349,7 +348,7 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
             <p className="text-sm">{t('chat.noMessages', locale)}</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {messages.map((msg) => (
               <MessageBubble
                 key={msg.id}
@@ -365,14 +364,14 @@ export default function ChatArea({ roomId, locale }: ChatAreaProps) {
       </div>
 
       {typingNames.length > 0 && (
-        <div className="px-6 py-1.5">
+        <div className="px-3 sm:px-6 py-1.5">
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <div className="flex gap-0.5">
               <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
               <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
               <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
-            <span>
+            <span className="truncate">
               {typingNames.join(', ')} {t('chat.typing', locale)}
             </span>
           </div>

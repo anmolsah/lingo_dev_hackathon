@@ -35,15 +35,15 @@ export default function MessageBubble({
     <div
       className={`flex ${isOwn ? 'justify-end' : 'justify-start'} group animate-message-in`}
     >
-      <div className={`max-w-[70%] ${isOwn ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[85%] sm:max-w-[70%] ${isOwn ? 'items-end' : 'items-start'}`}>
         {!isOwn && message.sender && (
           <div className="flex items-center gap-2 mb-1 ml-1">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center flex-shrink-0">
-              <span className="text-[10px] font-bold text-white">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center flex-shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-bold text-white">
                 {message.sender.display_name.charAt(0).toUpperCase()}
               </span>
             </div>
-            <span className="text-xs font-semibold text-slate-600">
+            <span className="text-xs font-semibold text-slate-600 truncate max-w-[120px] sm:max-w-none">
               {message.sender.display_name}
             </span>
             <span className="text-xs text-slate-400">
@@ -53,7 +53,7 @@ export default function MessageBubble({
         )}
 
         <div
-          className={`relative px-4 py-3 ${
+          className={`relative px-3 sm:px-4 py-2.5 sm:py-3 ${
             isOwn
               ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-2xl rounded-br-md shadow-sm'
               : 'bg-white text-slate-900 rounded-2xl rounded-bl-md shadow-sm border border-slate-100'
@@ -106,11 +106,11 @@ export default function MessageBubble({
             isOwn ? 'justify-end mr-1' : 'ml-1'
           }`}
         >
-          <span className="text-[11px] text-slate-400">{time}</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400">{time}</span>
           {needsTranslation && hasTranslation && (
-            <span className="text-[11px] text-teal-500 flex items-center gap-0.5">
+            <span className="text-[10px] sm:text-[11px] text-teal-500 flex items-center gap-0.5">
               <Languages className="w-3 h-3" />
-              Translated
+              <span className="hidden sm:inline">Translated</span>
             </span>
           )}
         </div>

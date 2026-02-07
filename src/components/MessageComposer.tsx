@@ -51,9 +51,9 @@ export default function MessageComposer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="px-6 py-4 border-t border-slate-100 bg-white"
+      className="px-3 sm:px-6 py-3 sm:py-4 border-t border-slate-100 bg-white"
     >
-      <div className="flex items-end gap-3">
+      <div className="flex items-end gap-2 sm:gap-3">
         <div className="flex-1 relative">
           <textarea
             ref={inputRef}
@@ -63,11 +63,11 @@ export default function MessageComposer({
             placeholder={t('chat.typeMessage', locale)}
             disabled={disabled}
             rows={1}
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white outline-none transition-all disabled:opacity-50 max-h-32"
-            style={{ minHeight: '44px' }}
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white outline-none transition-all disabled:opacity-50 max-h-32"
+            style={{ minHeight: '42px' }}
             onInput={(e) => {
               const target = e.target as HTMLTextAreaElement;
-              target.style.height = '44px';
+              target.style.height = '42px';
               target.style.height = Math.min(target.scrollHeight, 128) + 'px';
             }}
           />
@@ -75,9 +75,9 @@ export default function MessageComposer({
         <button
           type="submit"
           disabled={!content.trim() || disabled}
-          className="flex-shrink-0 w-11 h-11 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-teal-500/25 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+          className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-teal-500/25 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
         >
-          <Send className="w-4.5 h-4.5" />
+          <Send className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
         </button>
       </div>
     </form>

@@ -41,10 +41,10 @@ export default function JoinByCodeModal({ onClose, onJoined, locale }: JoinByCod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md animate-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 w-full sm:max-w-md animate-in">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <KeyRound className="w-5 h-5 text-teal-500" />
             <h2 className="text-lg font-semibold text-slate-900">
@@ -59,7 +59,7 @@ export default function JoinByCodeModal({ onClose, onJoined, locale }: JoinByCod
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <p className="text-sm text-slate-500">
             {t('invite.subtitle', locale)}
           </p>

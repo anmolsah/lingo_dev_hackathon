@@ -18,16 +18,41 @@ const ROTATING_WORDS = [
 
 export default function LandingPage({ onGetStarted }: LandingPageProps) {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [previewLang, setPreviewLang] = useState<LanguageCode>('en');
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
-    const interval = setInterval(() => {
-      setCurrentWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
-    }, 2000);
-    return () => clearInterval(interval);
   }, []);
+
+  // Typewriter effect
+  useEffect(() => {
+    const currentWord = ROTATING_WORDS[currentWordIndex].text;
+    
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        // Typing
+        if (displayedText.length < currentWord.length) {
+          setDisplayedText(currentWord.slice(0, displayedText.length + 1));
+        } else {
+          // Pause before deleting
+          setTimeout(() => setIsDeleting(true), 1500);
+        }
+      } else {
+        // Deleting
+        if (displayedText.length > 0) {
+          setDisplayedText(displayedText.slice(0, -1));
+        } else {
+          setIsDeleting(false);
+          setCurrentWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
+        }
+      }
+    }, isDeleting ? 50 : 100); // Faster deletion, slower typing
+
+    return () => clearTimeout(timeout);
+  }, [displayedText, isDeleting, currentWordIndex]);
 
   const features = [
     {
@@ -108,10 +133,11 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
             {t('app.tagline', previewLang).split('.')[0]}.
             <br />
             <span className="relative inline-block mt-2">
-              <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                {ROTATING_WORDS[currentWordIndex].text}
+              <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent min-w-[200px] inline-block">
+                {displayedText}
+                <span className="inline-block w-[3px] h-[0.9em] bg-teal-600 ml-1 animate-pulse align-middle" />
               </span>
-              <span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full animate-pulse" />
+              <span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full" />
             </span>
           </h1>
 

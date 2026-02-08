@@ -4,7 +4,8 @@ BabelChat is a real-time multilingual chat application that automatically transl
 
 ## Demo
 
-[Watch the Demo Video](https://drive.google.com/file/d/1p3xTJj5ALK3NDkM2NJbdWhlDe7ljYITR/view?usp=sharing)
+- [Live Website](https://lingo-dev-hackathon.vercel.app/)
+- [Watch the Demo Video](https://drive.google.com/file/d/1p3xTJj5ALK3NDkM2NJbdWhlDe7ljYITR/view?usp=sharing)
 
 ## Features
 

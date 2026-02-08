@@ -2,6 +2,10 @@
 
 BabelChat is a real-time multilingual chat application that automatically translates messages between users speaking different languages. It enables seamless cross-language conversations powered by AI translation.
 
+## Demo
+
+[Watch the Demo Video](https://drive.google.com/file/d/1WiFZaLgjhzNxBq-duy-7Pr5RkiEtgx59/view?usp=sharing)
+
 ## Features
 
 - **Real-Time Messaging** -- Messages appear instantly for all room members via WebSocket subscriptions.
@@ -15,7 +19,7 @@ BabelChat is a real-time multilingual chat application that automatically transl
 ## Supported Languages
 
 | Language | Code |
-|----------|------|
+| -------- | ---- |
 | English  | en   |
 | Spanish  | es   |
 | French   | fr   |
@@ -25,13 +29,13 @@ BabelChat is a real-time multilingual chat application that automatically transl
 
 ## Tech Stack
 
-| Layer      | Technology                          |
-|------------|-------------------------------------|
-| Frontend   | React 18, TypeScript, Tailwind CSS  |
-| Build Tool | Vite                                |
-| Backend    | Supabase (PostgreSQL, Auth, Realtime, Edge Functions) |
-| Translation| Lingo.dev AI Engine                 |
-| Icons      | Lucide React                        |
+| Layer       | Technology                                            |
+| ----------- | ----------------------------------------------------- |
+| Frontend    | React 18, TypeScript, Tailwind CSS                    |
+| Build Tool  | Vite                                                  |
+| Backend     | Supabase (PostgreSQL, Auth, Realtime, Edge Functions) |
+| Translation | Lingo.dev AI Engine                                   |
+| Icons       | Lucide React                                          |
 
 ## Project Structure
 
